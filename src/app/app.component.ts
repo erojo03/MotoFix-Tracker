@@ -5,9 +5,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet],
-  template: `
-    
-  `,
+  template: ` <router-outlet /> `,
 })
 export class AppComponent {
   title = 'MotoFix-Tracker';
