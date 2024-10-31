@@ -10,16 +10,16 @@ export default [
       ),
   },
   {
-    path: 'motorcycle',
-    title: 'Motorcycle',
+    path: 'motorcycles',
+    title: 'Motorcycles',
     loadComponent: () =>
       import('./motorcycles/motorcycles.component').then(
         (m) => m.MotorcyclesComponent
       ),
   },
   {
-    path: 'notification',
-    title: 'Notification',
+    path: 'notifications',
+    title: 'Notifications',
     loadComponent: () =>
       import(
         './notifications/notifications.component'
