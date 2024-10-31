@@ -27,7 +27,7 @@ interface NavItem {
 
       <!-- Primary Navigation -->
       <div
-        class="flex w-full items-center justify-around md:w-auto md:flex-1 md:justify-center md:gap-8"
+        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-center md:gap-8"
       >
         @for (item of primaryNavItems; track item.link) {
         <a
@@ -44,7 +44,7 @@ interface NavItem {
 
       <!-- Secondary Navigation -->
       <div
-        class="flex w-full items-center justify-around md:w-auto md:flex-1 md:justify-end md:gap-8"
+        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-end md:gap-8"
       >
         @if (isMobile) { @for (item of secondaryNavItems; track item.link) {
         <a
@@ -52,7 +52,7 @@ interface NavItem {
           routerLinkActive="active"
           class="text-3xl text-navy-blue"
         >
-          <svg class="icon size-[26px]">
+          <svg class="size-[26px]">
             <use [attr.xlink:href]="getIconPath(item)"></use>
           </svg>
         </a>
@@ -61,7 +61,7 @@ interface NavItem {
           (click)="toggleChildMenu(item)"
           class="btn-navbar text-navy-blue"
         >
-          <svg class="icon size-[30px] fill-black">
+          <svg class="size-[30px] fill-black">
             <use [attr.xlink:href]="getIconPath(item)"></use>
           </svg>
         </button>
