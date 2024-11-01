@@ -8,13 +8,13 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
   imports: [RouterOutlet, NavbarComponent],
   template: `
     <app-navbar />
-    <main class="flex-1 overflow-y-auto px-4 pt-4 md:pt-0 md:px-0">
+    <main class="flex-1 overflow-y-auto px-4 pt-4 md:px-0 md:pt-0">
       <router-outlet />
     </main>
   `,
   styles: `
     :host {
-      @apply flex flex-col-reverse md:px-8 min-h-screen h-dvh md:flex-col
+      @apply flex h-dvh min-h-screen flex-col-reverse md:flex-col md:px-8;
     }
   `,
 })

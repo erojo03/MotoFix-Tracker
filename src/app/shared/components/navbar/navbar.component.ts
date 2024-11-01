@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map, Observable } from 'rxjs';
 import { BreakpointService } from '../../../core/services/utils/breakpoints.service';
@@ -17,60 +17,59 @@ interface NavItem {
   imports: [RouterLink, AsyncPipe],
   template: `
     @let isMobile = isMobile$ | async;
-    <nav class="relative flex items-center justify-center py-3 bg-primary">
+    <nav class="bg-primary relative flex items-center justify-center py-3">
       @if (!isMobile) {
-      <div class="flex-1">
-        <h1>MG2</h1>
-        <h2>Performance</h2>
-      </div>
+        <div class="flex-1">
+          <h1>MG2</h1>
+          <h2>Performance</h2>
+        </div>
       }
 
       <!-- Primary Navigation -->
       <div
-        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-center md:gap-8"
-      >
+        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-center md:gap-8">
         @for (item of primaryNavItems; track item.link) {
-        <a
-          [routerLink]="item.link"
-          routerLinkActive="active"
-          class="text-3xl text-navy-blue"
-        >
-          <svg class="icon" [class]="isMobile ? 'size-[26px]' : 'size-[30px]'">
-            <use [attr.xlink:href]="getIconPath(item)"></use>
-          </svg>
-        </a>
+          <a
+            [routerLink]="item.link"
+            routerLinkActive="active"
+            class="text-navy-blue text-3xl">
+            <svg [class]="isMobile ? 'size-[26px]' : 'size-[30px]'">
+              <use [attr.xlink:href]="getIconPath(item)"></use>
+            </svg>
+          </a>
         }
       </div>
 
       <!-- Secondary Navigation -->
       <div
-        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-end md:gap-8"
-      >
-        @if (isMobile) { @for (item of secondaryNavItems; track item.link) {
-        <a
-          [routerLink]="item.link"
-          routerLinkActive="active"
-          class="text-3xl text-navy-blue"
-        >
-          <svg class="size-[26px]">
-            <use [attr.xlink:href]="getIconPath(item)"></use>
-          </svg>
-        </a>
-        } } @else { @for (item of secondaryNavItems; track item.link) {
-        <button
-          (click)="toggleChildMenu(item)"
-          class="btn-navbar text-navy-blue"
-        >
-          <svg class="size-[30px] fill-black">
-            <use [attr.xlink:href]="getIconPath(item)"></use>
-          </svg>
-        </button>
-        } }
+        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-end md:gap-8">
+        @if (isMobile) {
+          @for (item of secondaryNavItems; track item.link) {
+            <a
+              [routerLink]="item.link"
+              routerLinkActive="active"
+              class="text-navy-blue text-3xl">
+              <svg class="size-[26px]">
+                <use [attr.xlink:href]="getIconPath(item)"></use>
+              </svg>
+            </a>
+          }
+        } @else {
+          @for (item of secondaryNavItems; track item.link) {
+            <button
+              (click)="toggleChildMenu(item)"
+              class="btn-navbar text-navy-blue">
+              <svg class="size-[30px] fill-black">
+                <use [attr.xlink:href]="getIconPath(item)"></use>
+              </svg>
+            </button>
+          }
+        }
       </div>
     </nav>
   `,
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly breakpointService = inject(BreakpointService);
 
