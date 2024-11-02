@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
-import { filter, map, Observable } from 'rxjs';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { map, Observable } from 'rxjs';
 import { BreakpointService } from '../../../core/services/utils/breakpoints.service';
 import { AsyncPipe } from '@angular/common';
 
@@ -17,7 +17,7 @@ interface NavItem {
   imports: [RouterLink, AsyncPipe],
   template: `
     @let isMobile = isMobile$ | async;
-    <nav class="bg-primary relative flex items-center justify-center py-3">
+    <nav class="relative flex items-center justify-center py-3">
       @if (!isMobile) {
         <div class="flex-1">
           <h1>MG2</h1>
@@ -29,10 +29,7 @@ interface NavItem {
       <div
         class="flex w-full justify-around md:w-auto md:flex-1 md:justify-center md:gap-8">
         @for (item of primaryNavItems; track item.link) {
-          <a
-            [routerLink]="item.link"
-            routerLinkActive="active"
-            class="text-navy-blue text-3xl">
+          <a [routerLink]="item.link" routerLinkActive="active">
             <svg [class]="isMobile ? 'size-[26px]' : 'size-[30px]'">
               <use [attr.xlink:href]="getIconPath(item)"></use>
             </svg>
@@ -45,10 +42,7 @@ interface NavItem {
         class="flex w-full justify-around md:w-auto md:flex-1 md:justify-end md:gap-8">
         @if (isMobile) {
           @for (item of secondaryNavItems; track item.link) {
-            <a
-              [routerLink]="item.link"
-              routerLinkActive="active"
-              class="text-navy-blue text-3xl">
+            <a [routerLink]="item.link" routerLinkActive="active">
               <svg class="size-[26px]">
                 <use [attr.xlink:href]="getIconPath(item)"></use>
               </svg>
@@ -56,10 +50,8 @@ interface NavItem {
           }
         } @else {
           @for (item of secondaryNavItems; track item.link) {
-            <button
-              (click)="toggleChildMenu(item)"
-              class="btn-navbar text-navy-blue">
-              <svg class="size-[30px] fill-black">
+            <button (click)="showMenu(item)">
+              <svg class="size-[30px]">
                 <use [attr.xlink:href]="getIconPath(item)"></use>
               </svg>
             </button>
@@ -69,12 +61,12 @@ interface NavItem {
     </nav>
   `,
 })
-export class NavbarComponent implements OnInit {
-  private readonly router = inject(Router);
-  private readonly breakpointService = inject(BreakpointService);
+export class NavbarComponent {
+  private readonly _router = inject(Router);
+  private readonly _breakpointService = inject(BreakpointService);
 
   protected readonly isMobile$: Observable<boolean> =
-    this.breakpointService.breakpoints$.pipe(map(({ isMobile }) => isMobile));
+    this._breakpointService.breakpoints$.pipe(map(({ isMobile }) => isMobile));
 
   protected readonly primaryNavItems: NavItem[] = [
     { icon: 'home', link: '/home', type: 'regular' },
@@ -96,43 +88,24 @@ export class NavbarComponent implements OnInit {
     },
   ];
 
-  ngOnInit(): void {
-    this.router.events
-      .pipe(
-        filter(
-          (event): event is NavigationEnd => event instanceof NavigationEnd
-        )
-      )
-      .subscribe(({ urlAfterRedirects }) => {
-        this.updateNavItemStates(urlAfterRedirects);
-      });
-
-    this.updateNavItemStates(this.router.url);
+  showMenu(item: NavItem): void {
+    this.secondaryNavItems.forEach((navItem) => {
+      const isCurrentItem = navItem === item;
+      navItem.type = isCurrentItem
+        ? navItem.type === 'solid'
+          ? 'regular'
+          : 'solid'
+        : 'regular';
+      navItem.childVisibility = isCurrentItem
+        ? navItem.childVisibility === 'hidden'
+          ? 'block'
+          : 'hidden'
+        : 'hidden';
+    });
   }
 
   protected getIconPath(item: NavItem): string {
-    const state = this.router.url.startsWith(item.link) ? 'solid' : item.type;
+    const state = this._router.url.startsWith(item.link) ? 'solid' : item.type;
     return `assets/icons/navbar/icons.svg#${item.icon}-${state}`;
-  }
-
-  protected toggleChildMenu(item: NavItem): void {
-    if (this.router.url === '/notification' && item.icon === 'bell') return;
-
-    this.secondaryNavItems.forEach((navItem) => {
-      if (navItem !== item) {
-        navItem.type = 'regular';
-        navItem.childVisibility = 'hidden';
-      }
-    });
-
-    item.type = item.type === 'solid' ? 'regular' : 'solid';
-    item.childVisibility =
-      item.childVisibility === 'hidden' ? 'block' : 'hidden';
-  }
-
-  private updateNavItemStates(currentUrl: string): void {
-    [...this.primaryNavItems, ...this.secondaryNavItems].forEach((item) => {
-      item.type = currentUrl.startsWith(item.link) ? 'solid' : 'regular';
-    });
   }
 }
