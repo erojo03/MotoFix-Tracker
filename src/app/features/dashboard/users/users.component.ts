@@ -1,21 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
+import { UserAddComponent } from './components/user-add/user-add.component';
+import { PopupService } from '../../../core/services/utils/popup.service';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [SearchBarComponent],
+  imports: [SearchBarComponent, UserAddComponent],
   template: `
     <!-- Header -->
-    <section class="md:flex md:items-center md:justify-between">
-      <h1>USUARIOS</h1>
-      <div class="flex flex-col gap-2 md:flex-row-reverse">
+    <section
+      class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
+      <h1 class="text-primary text-2xl font-extrabold">USUARIOS</h1>
+      <div class="flex flex-col gap-2.5 md:flex-row-reverse">
         <app-search-bar />
 
         <!-- Header Buttons -->
-        <div class="flex flex-shrink-0 gap-4">
+        <div class="flex flex-shrink-0 gap-2.5">
           <button
             type="button"
+            (click)="openPopup('addUser')"
             class="flex w-full items-center justify-center gap-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +59,22 @@ import { SearchBarComponent } from '../../../shared/components/search-bar/search
         </div>
       </div>
     </section>
+
+    @if (popupState('addUser')) {
+      <app-user-add />
+    }
   `,
   styles: ``,
 })
-export class UsersComponent {}
+export class UsersComponent {
+  private readonly _popupService = inject(PopupService);
+
+  openPopup(key: string): void {
+    this._popupService.openPopup(key);
+  }
+
+  popupState(key: string): boolean {
+    const state = this._popupService.getPopupState(key);
+    return state();
+  }
+}
