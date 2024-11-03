@@ -24,7 +24,11 @@ interface inputField {
         class="w-full rounded-md border px-3 py-1.5" />
     </label>
   `,
-  styles: ``,
+  styles: `
+    :host {
+      width: 100%;
+    }
+  `,
   viewProviders: [
     {
       provide: ControlContainer,
