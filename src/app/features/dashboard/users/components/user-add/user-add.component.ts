@@ -7,6 +7,7 @@ import {
 import { SubmitButtonComponent } from '../../../../../shared/components/small/submit-button/submit-button.component';
 import { SelectFieldsComponent } from '../../../../../shared/components/small/select-fields/select-fields.component';
 import { InputFieldsComponent } from '../../../../../shared/components/small/input-fields/input-fields.component';
+import { CloseButtonComponent } from '../../../../../shared/components/small/close-button/close-button.component';
 
 @Component({
   selector: 'app-user-add',
@@ -17,10 +18,13 @@ import { InputFieldsComponent } from '../../../../../shared/components/small/inp
     SubmitButtonComponent,
     SelectFieldsComponent,
     InputFieldsComponent,
-  ],
+    CloseButtonComponent
+],
   template: `
     <section
       class="relative flex w-full flex-col gap-4 rounded-lg bg-white p-6 shadow-xl md:max-w-2xl md:rounded-xl">
+      <app-close-button popupId="addUser" />
+
       <!-- Title -->
       <header class="text-center">
         <h1 class="text-2xl font-bold sm:text-3xl">Agregar Nuevo Usuario</h1>
