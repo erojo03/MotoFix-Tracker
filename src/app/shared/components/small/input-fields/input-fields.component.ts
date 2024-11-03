@@ -21,7 +21,7 @@ interface inputField {
         [formControlName]="field.name"
         [type]="field.type"
         [placeholder]="field.placeholder"
-        class="w-full rounded-md border px-3 py-1" />
+        class="w-full rounded-md border px-3 py-1.5" />
     </label>
   `,
   styles: ``,

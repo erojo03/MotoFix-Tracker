@@ -30,8 +30,10 @@ interface Entity {
     </label>
   `,
   styles: `
-    :host {
-      grid-column: span 2;
+    @media (min-width: 640px) {
+      :host {
+        grid-column: span 2;
+      }
     }
   `,
   viewProviders: [
