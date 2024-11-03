@@ -1,8 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { BreakpointService } from '../../../core/services/utils/breakpoints.service';
 import { AsyncPipe } from '@angular/common';
+import { UserMenuComponent } from '../../../features/dashboard/users/components/user-menu/user-menu.component';
+import { NotificationMenuComponent } from '../../../features/dashboard/notifications/components/notification-menu/notification-menu.component';
 
 interface NavItem {
   icon: string;
@@ -14,7 +16,12 @@ interface NavItem {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, AsyncPipe],
+  imports: [
+    RouterLink,
+    AsyncPipe,
+    UserMenuComponent,
+    NotificationMenuComponent,
+  ],
   template: `
     @let isMobile = isMobile$ | async;
     <nav class="relative flex items-center justify-center py-3">
@@ -50,7 +57,7 @@ interface NavItem {
           }
         } @else {
           @for (item of secondaryNavItems; track item.link) {
-            <button (click)="showMenu(item)">
+            <button class="btn-navbar" (click)="showMenu(item)">
               <svg class="size-[30px]">
                 <use [attr.xlink:href]="getIconPath(item)"></use>
               </svg>
@@ -59,6 +66,20 @@ interface NavItem {
         }
       </div>
     </nav>
+
+    <!-- Notification Menu -->
+    @if (secondaryNavItems[0].childVisibility !== 'hidden') {
+      <app-notification-menu
+        id="noti-menu"
+        (clickOutside)="hideMenu(secondaryNavItems[0])" />
+    }
+
+    <!-- User Menu -->
+    @if (secondaryNavItems[1].childVisibility !== 'hidden') {
+      <app-user-menu
+        id="user-menu"
+        (clickOutside)="hideMenu(secondaryNavItems[1])" />
+    }
   `,
 })
 export class NavbarComponent {
@@ -89,6 +110,10 @@ export class NavbarComponent {
   ];
 
   showMenu(item: NavItem): void {
+    if (this._router.url === '/notifications' && item.icon === 'bell') {
+      return;
+    }
+
     this.secondaryNavItems.forEach((navItem) => {
       const isCurrentItem = navItem === item;
       navItem.type = isCurrentItem
@@ -104,8 +129,29 @@ export class NavbarComponent {
     });
   }
 
+  hideMenu(item: NavItem) {
+    if (!this._router.url.startsWith(item.link)) {
+      item.childVisibility = 'hidden';
+    }
+  }
+
   protected getIconPath(item: NavItem): string {
     const state = this._router.url.startsWith(item.link) ? 'solid' : item.type;
     return `assets/icons/navbar/icons.svg#${item.icon}-${state}`;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (
+      !target.closest('.btn-navbar') &&
+      !target.closest('#noti-menu') &&
+      !target.closest('#user-menu')
+    ) {
+      this.secondaryNavItems.forEach((navItem) => {
+        navItem.type = 'regular';
+        navItem.childVisibility = 'hidden';
+      });
+    }
   }
 }
