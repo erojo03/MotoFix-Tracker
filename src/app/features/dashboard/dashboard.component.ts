@@ -14,7 +14,7 @@ import { NavbarComponent } from '../../shared/components/navbar/navbar.component
   `,
   styles: `
     :host {
-      @apply flex h-dvh min-h-screen flex-col-reverse md:flex-col md:px-8;
+      @apply flex h-dvh min-h-screen flex-col-reverse md:flex-col md:px-8 md:gap-4;
     }
   `,
 })
