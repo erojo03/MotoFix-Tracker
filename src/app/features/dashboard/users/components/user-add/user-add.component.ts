@@ -18,8 +18,8 @@ import { CloseButtonComponent } from '../../../../../shared/components/small/clo
     SubmitButtonComponent,
     SelectFieldsComponent,
     InputFieldsComponent,
-    CloseButtonComponent
-],
+    CloseButtonComponent,
+  ],
   template: `
     <section
       class="relative flex w-full flex-col gap-4 rounded-lg bg-white p-6 shadow-xl md:max-w-2xl md:rounded-xl">
@@ -46,6 +46,7 @@ import { CloseButtonComponent } from '../../../../../shared/components/small/clo
 
       <!-- Submit Button -->
       <app-submit-button
+        text="Agregar Usuario"
         [formValid]="userForm.valid"
         (submitForm)="onSubmit()" />
     </section>
