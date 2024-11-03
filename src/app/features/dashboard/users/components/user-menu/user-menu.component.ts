@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -25,6 +25,7 @@ import { RouterLink } from '@angular/router';
 
       <a
         routerLink="/users"
+        (click)="clickOutsideEvent()"
         class="flex cursor-pointer items-center gap-1.5 rounded-xl py-2 pl-1.5 pr-2 hover:bg-[rgba(245,245,245)]">
         <svg
           fill="#000000"
@@ -62,4 +63,11 @@ import { RouterLink } from '@angular/router';
     }
   `,
 })
-export class UserMenuComponent {}
+export class UserMenuComponent {
+  @Output() clickOutside = new EventEmitter<void>();
+
+  clickOutsideEvent() {
+    this.clickOutside.emit();
+  }
+
+}
