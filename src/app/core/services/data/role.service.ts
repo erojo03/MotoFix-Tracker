@@ -2,11 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
-
-interface Role {
-  id: number;
-  name: string;
-}
+import { Role } from '../../interfaces/role.interface';
 
 @Injectable({
   providedIn: 'root',
