@@ -7,6 +7,7 @@ import {
 import { SubmitButtonComponent } from '../../shared/components/small/submit-button/submit-button.component';
 import { InputFieldsComponent } from '../../shared/components/small/input-fields/input-fields.component';
 import { AuthService } from '../../core/services/data/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -55,6 +56,7 @@ import { AuthService } from '../../core/services/data/auth.service';
 export class LoginComponent {
   private readonly _fb = inject(NonNullableFormBuilder);
   private _authService = inject(AuthService);
+  private readonly _router = inject(Router);
 
   fields = [
     {
@@ -80,13 +82,10 @@ export class LoginComponent {
       const { phone, password } = this.loginForm.getRawValue();
 
       this._authService.logIn(phone, password).subscribe({
-        next: (response) => {
-          console.log('Login successful', response);
-          // Handle successful login
-        },
+        next: () => this._router.navigateByUrl('/'),
         error: (error) => {
-          console.error('Login failed', error);
-          // Handle login error
+          console.error('Error fetching data', error.error);
+          this.loginForm.reset();
         },
       });
     }
