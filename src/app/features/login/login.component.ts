@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import {
+  FormGroup,
   NonNullableFormBuilder,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { SubmitButtonComponent } from '../../shared/components/small/submit-button/submit-button.component';
 import { InputFieldsComponent } from '../../shared/components/small/input-fields/input-fields.component';
+import { AuthService } from '../../core/services/data/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +31,7 @@ import { InputFieldsComponent } from '../../shared/components/small/input-fields
             BIENVENIDO
           </h1>
           <form
-            [formGroup]="logInForm"
+            [formGroup]="loginForm"
             (ngSubmit)="onSubmit()"
             class="flex w-full flex-col items-center gap-3">
             @for (field of fields; track field.name) {
@@ -53,6 +54,7 @@ import { InputFieldsComponent } from '../../shared/components/small/input-fields
 })
 export class LoginComponent {
   private readonly _fb = inject(NonNullableFormBuilder);
+  private _authService = inject(AuthService);
 
   fields = [
     {
@@ -71,12 +73,22 @@ export class LoginComponent {
     },
   ];
 
-  logInForm = this._fb.group({
-    phone: ['', [Validators.required, Validators.pattern(/^\+[1-9]\d{1,14}$/)]],
-    password: ['', Validators.required],
-  });
+  loginForm: FormGroup = this._fb.group({});
 
   onSubmit(): void {
-    console.log(this.logInForm.getRawValue());
+    if (this.loginForm.valid) {
+      const { phone, password } = this.loginForm.getRawValue();
+
+      this._authService.logIn(phone, password).subscribe({
+        next: (response) => {
+          console.log('Login successful', response);
+          // Handle successful login
+        },
+        error: (error) => {
+          console.error('Login failed', error);
+          // Handle login error
+        },
+      });
+    }
   }
 }
