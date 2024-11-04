@@ -2,6 +2,8 @@ import { Component, inject } from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { UserAddComponent } from './components/user-add/user-add.component';
 import { PopupService } from '../../../core/services/utils/popup.service';
+import { RoleService } from '../../../core/services/data/role.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-users',
@@ -61,13 +63,16 @@ import { PopupService } from '../../../core/services/utils/popup.service';
     </section>
 
     @if (popupState('addUser')) {
-      <app-user-add />
+      <app-user-add [roles]="roles()"/>
     }
   `,
   styles: ``,
 })
 export class UsersComponent {
   private readonly _popupService = inject(PopupService);
+  private readonly _roleService = inject(RoleService);
+
+  roles = toSignal(this._roleService.getRoles());
 
   openPopup(key: string): void {
     this._popupService.openPopup(key);
