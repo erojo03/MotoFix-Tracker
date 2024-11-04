@@ -1,10 +1,13 @@
 import { Routes } from '@angular/router';
+import { privateGuard, publicGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
     title: 'Login',
-    loadComponent: () => import('./features/login/login.component').then((m) => m.LoginComponent)
+    canActivate: [publicGuard],
+    loadComponent: () =>
+      import('./features/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: '',
@@ -14,6 +17,7 @@ export const routes: Routes = [
   {
     path: '',
     title: 'Dashboard',
+    canActivate: [privateGuard],
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
