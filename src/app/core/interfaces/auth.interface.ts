@@ -7,6 +7,6 @@ export interface signUp {
 }
 
 export interface logIn {
-  phone: number;
+  phone: string;
   password: string;
 }
