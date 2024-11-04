@@ -1,5 +1,11 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { ControlContainer, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ControlContainer,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 interface inputField {
   name: string;
@@ -21,6 +27,7 @@ interface inputField {
         [formControlName]="field.name"
         [type]="field.type"
         [placeholder]="field.placeholder"
+        autocomplete="current-password"
         class="w-full rounded-md border px-3 py-1.5" />
     </label>
   `,
@@ -43,10 +50,20 @@ export class InputFieldsComponent implements OnInit {
   private _fb = inject(NonNullableFormBuilder);
 
   ngOnInit(): void {
-    this.parentForm.addControl(
-      this.field.name,
-      this._fb.control('', [Validators.required])
-    );
+    if (this.field.name === 'phone') {
+      this.parentForm.addControl(
+        this.field.name,
+        this._fb.control('', [
+          Validators.required,
+          Validators.pattern(/^9\d{8}$/),
+        ])
+      );
+    } else {
+      this.parentForm.addControl(
+        this.field.name,
+        this._fb.control('', [Validators.required])
+      );
+    }
   }
 
   get parentForm() {
