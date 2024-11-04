@@ -8,6 +8,10 @@
   }
 }
 
+* {
+  scrollbar-width: none
+}
+
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
