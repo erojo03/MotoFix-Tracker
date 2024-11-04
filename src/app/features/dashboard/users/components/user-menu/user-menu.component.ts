@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-menu',
@@ -42,6 +42,7 @@ import { RouterLink } from '@angular/router';
       <hr class="my-1" />
 
       <button
+        (click)="logOut()"
         class="flex items-center justify-center gap-2 rounded-xl px-3 py-2 hover:bg-[rgba(245,245,245)]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -66,8 +67,14 @@ import { RouterLink } from '@angular/router';
 export class UserMenuComponent {
   @Output() clickOutside = new EventEmitter<void>();
 
+  private readonly _router = inject(Router);
+
   clickOutsideEvent() {
     this.clickOutside.emit();
   }
 
+  logOut(): void {
+    localStorage.removeItem('session');
+    this._router.navigate(['/login']);
+  }
 }
