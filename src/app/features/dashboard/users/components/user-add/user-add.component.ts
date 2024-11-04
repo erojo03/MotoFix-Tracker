@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import {
   FormGroup,
   NonNullableFormBuilder,
@@ -8,6 +13,7 @@ import { SubmitButtonComponent } from '../../../../../shared/components/small/su
 import { SelectFieldsComponent } from '../../../../../shared/components/small/select-fields/select-fields.component';
 import { InputFieldsComponent } from '../../../../../shared/components/small/input-fields/input-fields.component';
 import { CloseButtonComponent } from '../../../../../shared/components/small/close-button/close-button.component';
+import { Role } from '../../../../../core/interfaces/role.interface';
 
 @Component({
   selector: 'app-user-add',
@@ -41,7 +47,7 @@ import { CloseButtonComponent } from '../../../../../shared/components/small/clo
         @for (field of fields; track field.name) {
           <app-input-fields [field]="field" />
         }
-        <app-select-fields title="Rol" controlKey="role" />
+        <app-select-fields title="Rol" [entities]="roles()" controlKey="role" />
       </form>
 
       <!-- Submit Button -->
@@ -58,6 +64,8 @@ import { CloseButtonComponent } from '../../../../../shared/components/small/clo
   `,
 })
 export class UserAddComponent {
+  roles = input<Role[]>();
+
   private readonly _fb = inject(NonNullableFormBuilder);
 
   fields = [
