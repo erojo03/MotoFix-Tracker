@@ -4,16 +4,19 @@ import { UserAddComponent } from './components/user-add/user-add.component';
 import { PopupService } from '../../../core/services/utils/popup.service';
 import { RoleService } from '../../../core/services/data/role.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { UserService } from '../../../core/services/data/user.service';
+import { AsyncPipe } from '@angular/common';
+import { UserItemComponent } from './components/user-item/user-item.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [SearchBarComponent, UserAddComponent],
+  imports: [SearchBarComponent, UserAddComponent, AsyncPipe, UserItemComponent],
   template: `
     <!-- Header -->
     <section
       class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
-      <h1 class="text-primary text-2xl font-extrabold">USUARIOS</h1>
+      <h1 class="text-2xl font-extrabold text-primary">USUARIOS</h1>
       <div class="flex flex-col gap-2.5 md:flex-row-reverse">
         <app-search-bar />
 
@@ -62,16 +65,33 @@ import { toSignal } from '@angular/core/rxjs-interop';
       </div>
     </section>
 
+    <!-- Main -->
+    @let users = users$ | async;
+    <section class="flex flex-col items-center flex-grow overflow-y-auto gap-3 pb-4">
+      @for (user of users; track user.id) {
+        <app-user-item [user]="user" />
+      }
+    </section>
+
     @if (popupState('addUser')) {
-      <app-user-add [roles]="roles()"/>
+      <app-user-add [roles]="roles()" />
     }
   `,
-  styles: ``,
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+    }
+  `,
 })
 export class UsersComponent {
   private readonly _popupService = inject(PopupService);
+  private readonly _userService = inject(UserService);
   private readonly _roleService = inject(RoleService);
 
+  users$ = this._userService.getUsers();
   roles = toSignal(this._roleService.getRoles());
 
   openPopup(key: string): void {
