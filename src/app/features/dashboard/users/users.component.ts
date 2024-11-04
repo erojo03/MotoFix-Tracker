@@ -7,12 +7,22 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { UserService } from '../../../core/services/data/user.service';
 import { AsyncPipe } from '@angular/common';
 import { UserItemComponent } from './components/user-item/user-item.component';
+import { UserTableComponent } from './components/user-table/user-table.component';
+import { BreakpointService } from '../../../core/services/utils/breakpoints.service';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [SearchBarComponent, UserAddComponent, AsyncPipe, UserItemComponent],
+  imports: [
+    SearchBarComponent,
+    UserAddComponent,
+    AsyncPipe,
+    UserItemComponent,
+    UserTableComponent,
+  ],
   template: `
+    @let isMobile = isMobile$ | async;
     <!-- Header -->
     <section
       class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
@@ -67,9 +77,14 @@ import { UserItemComponent } from './components/user-item/user-item.component';
 
     <!-- Main -->
     @let users = users$ | async;
-    <section class="flex flex-col items-center flex-grow overflow-y-auto gap-3 pb-4">
-      @for (user of users; track user.id) {
-        <app-user-item [user]="user" />
+    <section
+      class="flex flex-grow flex-col items-center gap-3 overflow-y-auto pb-4">
+      @if (isMobile) {
+        @for (user of users; track user.id) {
+          <app-user-item [user]="user" />
+        }
+      } @else {
+        <app-user-table [users]="users" />
       }
     </section>
 
@@ -84,12 +99,18 @@ import { UserItemComponent } from './components/user-item/user-item.component';
       gap: 1rem;
       height: 100%;
     }
+
+    
   `,
 })
 export class UsersComponent {
   private readonly _popupService = inject(PopupService);
   private readonly _userService = inject(UserService);
   private readonly _roleService = inject(RoleService);
+  private readonly _breakpointService = inject(BreakpointService);
+
+  protected readonly isMobile$: Observable<boolean> =
+    this._breakpointService.breakpoints$.pipe(map(({ isMobile }) => isMobile));
 
   users$ = this._userService.getUsers();
   roles = toSignal(this._roleService.getRoles());
