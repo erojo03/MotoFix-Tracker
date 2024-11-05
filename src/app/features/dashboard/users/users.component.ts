@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { UserAddComponent } from './components/user-add/user-add.component';
 import { PopupService } from '../../../core/services/utils/popup.service';
@@ -76,15 +76,14 @@ import { map, Observable } from 'rxjs';
     </section>
 
     <!-- Main -->
-    @let users = users$ | async;
     <section
       class="flex flex-grow flex-col items-center gap-3 overflow-y-auto pb-4">
       @if (isMobile) {
-        @for (user of users; track user.id) {
-          <app-user-item [user]="user" />
+        @for (user of users(); track user.id) {
+          <app-user-item [user]="user" (delete)="deleteUser($event)" />
         }
       } @else {
-        <app-user-table [users]="users" />
+        <app-user-table [users]="users()" (delete)="deleteUser($event)" />
       }
     </section>
 
@@ -99,11 +98,9 @@ import { map, Observable } from 'rxjs';
       gap: 1rem;
       height: 100%;
     }
-
-    
   `,
 })
-export class UsersComponent {
+export class UsersComponent implements OnInit {
   private readonly _popupService = inject(PopupService);
   private readonly _userService = inject(UserService);
   private readonly _roleService = inject(RoleService);
@@ -112,8 +109,20 @@ export class UsersComponent {
   protected readonly isMobile$: Observable<boolean> =
     this._breakpointService.breakpoints$.pipe(map(({ isMobile }) => isMobile));
 
-  users$ = this._userService.getUsers();
+  users = this._userService.users;
   roles = toSignal(this._roleService.getRoles());
+
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this._userService.getUsers().subscribe();
+  }
+
+  deleteUser(id: string): void {
+    this._userService.deleteUser(id).subscribe();
+  }
 
   openPopup(key: string): void {
     this._popupService.openPopup(key);
