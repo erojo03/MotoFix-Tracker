@@ -14,6 +14,9 @@ import { SelectFieldsComponent } from '../../../../../shared/components/small/se
 import { InputFieldsComponent } from '../../../../../shared/components/small/input-fields/input-fields.component';
 import { CloseButtonComponent } from '../../../../../shared/components/small/close-button/close-button.component';
 import { Role } from '../../../../../core/interfaces/role.interface';
+import { PopupService } from '../../../../../core/services/utils/popup.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { UserService } from '../../../../../core/services/data/user.service';
 
 @Component({
   selector: 'app-user-add',
@@ -67,6 +70,8 @@ export class UserAddComponent {
   roles = input<Role[]>();
 
   private readonly _fb = inject(NonNullableFormBuilder);
+  private readonly _userService = inject(UserService);
+  private readonly _popupService = inject(PopupService);
 
   fields = [
     {
@@ -102,6 +107,29 @@ export class UserAddComponent {
   userForm: FormGroup = this._fb.group({});
 
   onSubmit(): void {
-    console.log(this.userForm.value);
+    if (this.userForm.invalid) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
+
+    const { firstName, lastName, phone, password, role } =
+      this.userForm.getRawValue();
+
+    this._userService
+      .createUser(firstName, lastName, phone, password, Number(role))
+      .subscribe({
+        next: () => {
+          // this.userForm.reset();
+          this._popupService.closePopup('addUser');
+        },
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 400) {
+            // Ejemplo: Bad Request
+            console.error('Error al registrar usuario:', error.error);
+          } else {
+            console.error('Error inesperado:', error);
+          }
+        },
+      });
   }
 }
