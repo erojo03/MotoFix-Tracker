@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-user-item',
@@ -47,7 +47,9 @@ import { Component, Input } from '@angular/core';
               d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path>
           </svg>
         </button>
-        <button>
+        
+        <button
+        (click)="deleteUser(user.id)">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
@@ -79,4 +81,10 @@ export class UserItemComponent {
     role: '',
     attendance: '',
   };
+
+  @Output() delete = new EventEmitter<string>();
+
+  deleteUser(id: string): void {
+    this.delete.emit(id);
+  }
 }
