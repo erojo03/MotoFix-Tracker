@@ -6,7 +6,10 @@ interface UserBase {
 }
 
 export interface UserList extends UserBase {
-  role: string;
+  role: {
+    id: number;
+    name: string;
+  };
   attendance: string;
 }
 
