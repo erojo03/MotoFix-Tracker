@@ -25,10 +25,14 @@ export class RoleService {
         response.map((role) => {
           return {
             id: role.id,
-            name: this.rolesTranslate[role.name] || role.name,
+            name: this.translateRole(role.name),
           };
         })
       )
     );
+  }
+
+  translateRole(roleName: string): string {
+    return this.rolesTranslate[roleName] || roleName;
   }
 }
