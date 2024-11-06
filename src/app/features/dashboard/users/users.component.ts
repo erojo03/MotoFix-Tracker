@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { UserAddComponent } from './components/user-add/user-add.component';
 import { PopupService } from '../../../core/services/utils/popup.service';
@@ -10,6 +10,7 @@ import { UserItemComponent } from './components/user-item/user-item.component';
 import { UserTableComponent } from './components/user-table/user-table.component';
 import { BreakpointService } from '../../../core/services/utils/breakpoints.service';
 import { map, Observable } from 'rxjs';
+import { UserEditComponent } from './components/user-edit/user-edit.component';
 
 @Component({
   selector: 'app-users',
@@ -20,6 +21,7 @@ import { map, Observable } from 'rxjs';
     AsyncPipe,
     UserItemComponent,
     UserTableComponent,
+    UserEditComponent,
   ],
   template: `
     @let isMobile = isMobile$ | async;
@@ -80,15 +82,27 @@ import { map, Observable } from 'rxjs';
       class="flex flex-grow flex-col items-center gap-3 overflow-y-auto pb-4">
       @if (isMobile) {
         @for (user of users(); track user.id) {
-          <app-user-item [user]="user" (delete)="deleteUser($event)" />
+          <app-user-item
+            [(userId)]="userId"
+            [user]="user"
+            (openEdit)="openPopup('editUser')"
+            (delete)="deleteUser($event)" />
         }
       } @else {
-        <app-user-table [users]="users()" (delete)="deleteUser($event)" />
+        <app-user-table
+          [(userId)]="userId"
+          [users]="users()"
+          (openEdit)="openPopup('editUser')"
+          (delete)="deleteUser($event)" />
       }
     </section>
 
     @if (popupState('addUser')) {
       <app-user-add [roles]="roles()" />
+    }
+
+    @if (popupState('editUser')) {
+      <app-user-edit [roles]="roles()" [user]="user()" />
     }
   `,
   styles: `
@@ -111,6 +125,9 @@ export class UsersComponent implements OnInit {
 
   users = this._userService.users;
   roles = toSignal(this._roleService.getRoles());
+  userId = signal('');
+
+  user = computed(() => this.users().find((user) => user.id === this.userId()));
 
   ngOnInit(): void {
     this.loadUsers();
