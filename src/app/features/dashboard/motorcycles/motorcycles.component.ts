@@ -19,11 +19,30 @@ import { MotorcycleService } from './services/motorcycle.service';
       <app-search-bar />
     </section>
     <!-- Motorcycle List -->
-    <section class="grid-cols-auto-fill-100 grid auto-rows-[166px]">
+    <section class="grid auto-rows-[166px] grid-cols-auto-fill-100">
       @for (motorcycle of motorcycles(); track motorcycle.id) {
         <app-motorcycle-item [motorcycle]="motorcycle" />
       }
     </section>
+
+    <!-- Add Button -->
+    <button
+      class="absolute bottom-[26px] right-1/2 translate-x-1/2 rounded-full bg-red-500 p-3 text-white shadow-lg md:bottom-0 md:right-0 md:m-8 md:translate-x-0">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-8 w-8">
+        <path d="M5 12h14"></path>
+        <path d="M12 5v14"></path>
+      </svg>
+    </button>
   `,
   styles: `
     :host {
