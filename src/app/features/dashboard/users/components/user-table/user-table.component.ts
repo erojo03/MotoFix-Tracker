@@ -1,4 +1,4 @@
-import { Component, EventEmitter, input, Output } from '@angular/core';
+import { Component, EventEmitter, input, model, Output } from '@angular/core';
 import { UserList } from '../../../../../core/interfaces/user.interface';
 
 @Component({
@@ -30,7 +30,7 @@ import { UserList } from '../../../../../core/interfaces/user.interface';
               <td class="px-4 py-3">{{ user.firstName }}</td>
               <td class="px-4 py-3">{{ user.lastName }}</td>
               <td class="px-4 py-3">{{ user.phone }}</td>
-              <td class="px-4 py-3">{{ user.role }}</td>
+              <td class="px-4 py-3">{{ user.role.name }}</td>
               <td class="px-4 py-3 text-center">
                 <select class="rounded-lg p-2">
                   <option value="" disabled selected>Asistencia</option>
@@ -39,7 +39,7 @@ import { UserList } from '../../../../../core/interfaces/user.interface';
                 </select>
               </td>
               <td class="flex justify-center gap-4 px-4 py-3">
-                <button class="group">
+                <button class="group" (click)="editUser(user.id)">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 512 512"
@@ -68,13 +68,20 @@ import { UserList } from '../../../../../core/interfaces/user.interface';
   `,
   styles: `
     :host {
-      @apply flex w-full justify-center;
+      @apply flex h-full w-full justify-center;
     }
   `,
 })
 export class UserTableComponent {
   users = input.required<UserList[] | null>();
+  userId = model.required<string>();
+  @Output() openEdit = new EventEmitter<void>();
   @Output() delete = new EventEmitter<string>();
+
+  editUser(id: string) {
+    this.userId.set(id);
+    this.openEdit.emit();
+  }
 
   deleteUser(id: string) {
     this.delete.emit(id);

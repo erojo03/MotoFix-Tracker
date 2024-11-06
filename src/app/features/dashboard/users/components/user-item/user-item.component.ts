@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, model, Output } from '@angular/core';
 
 @Component({
   selector: 'app-user-item',
@@ -19,7 +19,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
           <h1 class="text-navy-blue font-semibold">
             {{ user.firstName.split(' ', 1) }} {{ user.lastName.split(' ', 1) }}
           </h1>
-          <span class="text-sm font-medium text-gray-500">{{ user.role }}</span>
+          <span class="text-sm font-medium text-gray-500">{{
+            user.role.name
+          }}</span>
         </div>
       </div>
 
@@ -30,7 +32,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       </select>
 
       <div class="flex flex-col gap-2">
-        <button>
+        <button (click)="editUser(user.id)">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -47,9 +49,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
               d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path>
           </svg>
         </button>
-        
-        <button
-        (click)="deleteUser(user.id)">
+
+        <button (click)="deleteUser(user.id)">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
@@ -74,15 +75,21 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   `,
 })
 export class UserItemComponent {
+  userId = model.required<string>();
   @Input({ required: true }) user = {
     id: '',
     firstName: '',
     lastName: '',
-    role: '',
+    role: { id: 0, name: '' },
     attendance: '',
   };
-
+  @Output() openEdit = new EventEmitter<void>();
   @Output() delete = new EventEmitter<string>();
+
+  editUser(id: string) {
+    this.userId.set(id);
+    this.openEdit.emit();
+  }
 
   deleteUser(id: string): void {
     this.delete.emit(id);
