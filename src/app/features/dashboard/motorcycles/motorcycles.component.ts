@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { DatePipe } from '@angular/common';
+import { MotorcycleItemComponent } from './components/motorcycle-item/motorcycle-item.component';
+import { MotorcycleService } from './services/motorcycle.service';
 
 @Component({
   selector: 'app-motorcycles',
   standalone: true,
-  imports: [SearchBarComponent, DatePipe],
+  imports: [SearchBarComponent, DatePipe, MotorcycleItemComponent],
   template: `
     <!-- Header -->
     <section
@@ -16,12 +18,33 @@ import { DatePipe } from '@angular/common';
       </header>
       <app-search-bar />
     </section>
-
     <!-- Motorcycle List -->
-    <section></section>
+    <section class="grid-cols-auto-fill-100 grid auto-rows-[166px]">
+      @for (motorcycle of motorcycles(); track motorcycle.id) {
+        <app-motorcycle-item [motorcycle]="motorcycle" />
+      }
+    </section>
   `,
-  styles: ``,
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+    }
+  `,
 })
-export class MotorcyclesComponent {
+export class MotorcyclesComponent implements OnInit {
+  private readonly _motorcycleService = inject(MotorcycleService);
+
   date = new Date();
+  motorcycles = this._motorcycleService.motorcycles;
+
+  ngOnInit(): void {
+    this.loadMotorcycles();
+  }
+
+  loadMotorcycles() {
+    this._motorcycleService.getMotos().subscribe();
+  }
 }
