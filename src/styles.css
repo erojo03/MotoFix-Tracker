@@ -9,9 +9,9 @@
 }
 
 * {
-  scrollbar-width: none
+  scrollbar-width: none;
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
