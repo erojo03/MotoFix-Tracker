@@ -33,8 +33,7 @@ interface NavItem {
       }
 
       <!-- Primary Navigation -->
-      <div
-        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-center md:gap-8">
+      <div class="flex flex-1 justify-around md:justify-center md:gap-8">
         @for (item of primaryNavItems; track item.link) {
           <a [routerLink]="item.link" routerLinkActive="active">
             <svg [class]="isMobile ? 'size-[26px]' : 'size-[30px]'">
@@ -44,9 +43,13 @@ interface NavItem {
         }
       </div>
 
+      <!-- Space for button -->
+      @if (isMobile) {
+        <div class="h-7 w-14"></div>
+      }
+
       <!-- Secondary Navigation -->
-      <div
-        class="flex w-full justify-around md:w-auto md:flex-1 md:justify-end md:gap-8">
+      <div class="flex flex-1 justify-around md:justify-end md:gap-8">
         @if (isMobile) {
           @for (item of secondaryNavItems; track item.link) {
             <a [routerLink]="item.link" routerLinkActive="active">
