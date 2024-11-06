@@ -25,7 +25,10 @@ export class UserService {
         response.map((user) => {
           return {
             ...user,
-            role: this._roleService.rolesTranslate[user.role] || user.role,
+            role: {
+              id: user.role.id,
+              name: this._roleService.translateRole(user.role.name),
+            },
           };
         })
       ),
@@ -62,13 +65,15 @@ export class UserService {
     phone: string,
     password: string,
     roleId: number
-  ): Observable<User> {
-    return this._http.put<User>(`${environment.API_URL}/users/${id}`, {
-      firstName,
-      lastName,
-      phone,
-      password,
-      roleId,
-    });
+  ): Observable<UserList[]> {
+    return this._http
+      .put<UserList[]>(`${environment.API_URL}/users/${id}`, {
+        firstName,
+        lastName,
+        phone,
+        password,
+        roleId,
+      })
+      .pipe(switchMap(() => this.getUsers()));
   }
 }
