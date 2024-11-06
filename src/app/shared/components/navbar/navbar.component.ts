@@ -44,7 +44,7 @@ interface NavItem {
       </div>
 
       <!-- Space for button -->
-      @if (isMobile) {
+      @if (isMobile && route === '/motorcycles') {
         <div class="h-7 w-14"></div>
       }
 
@@ -88,6 +88,10 @@ interface NavItem {
 export class NavbarComponent {
   private readonly _router = inject(Router);
   private readonly _breakpointService = inject(BreakpointService);
+
+  get route() {
+    return this._router.url;
+  }
 
   protected readonly isMobile$: Observable<boolean> =
     this._breakpointService.breakpoints$.pipe(map(({ isMobile }) => isMobile));
