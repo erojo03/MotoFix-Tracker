@@ -13,13 +13,15 @@ import { MotorcycleService } from './services/motorcycle.service';
     <section
       class="flex flex-col items-center gap-2.5 md:flex-row md:justify-between">
       <header class="w-full">
-        <h1 class="text-[1.4rem] font-extrabold">ATENCIONES MECANICAS</h1>
+        <h1 class="text-[1.4rem] font-extrabold text-primary">
+          ATENCIONES MECANICAS
+        </h1>
         <time class="font-medium">{{ date | date: 'dd / MM / yyyy' }}</time>
       </header>
       <app-search-bar />
     </section>
     <!-- Motorcycle List -->
-    <section class="grid auto-rows-[166px] grid-cols-auto-fill-100">
+    <section class="grid auto-rows-[166px] grid-cols-auto-fill-100 gap-4">
       @for (motorcycle of motorcycles(); track motorcycle.id) {
         <app-motorcycle-item [motorcycle]="motorcycle" />
       }
