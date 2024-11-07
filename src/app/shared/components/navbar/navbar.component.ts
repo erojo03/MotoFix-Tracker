@@ -24,7 +24,7 @@ interface NavItem {
   ],
   template: `
     @let isMobile = isMobile$ | async;
-    <nav class="relative flex items-center justify-center py-3">
+    <nav class="relative flex items-center justify-center bg-white py-3">
       @if (!isMobile) {
         <div class="flex-1">
           <h1>MG2</h1>
@@ -45,7 +45,10 @@ interface NavItem {
 
       <!-- Space for button -->
       @if (isMobile && route === '/motorcycles') {
-        <div class="h-7 w-14"></div>
+        <div class="h-7 w-14">
+          <div
+            class="absolute -top-[21px] left-1/2 h-10 w-20 -translate-x-1/2 translate-y-1/2 rounded-b-full border-b border-l border-r bg-[#F2F2F2]"></div>
+        </div>
       }
 
       <!-- Secondary Navigation -->
