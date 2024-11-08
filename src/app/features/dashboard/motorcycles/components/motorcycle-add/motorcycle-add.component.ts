@@ -5,10 +5,17 @@ import {
   OnInit,
 } from '@angular/core';
 import { CloseButtonComponent } from '../../../../../shared/components/small/close-button/close-button.component';
-import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { InputFieldsComponent } from '../../../../../shared/components/small/input-fields/input-fields.component';
 import { BrandService } from '../../services/brand.service';
 import { SelectFieldsComponent } from '../../../../../shared/components/small/select-fields/select-fields.component';
+import { ModelService } from '../../services/model.service';
+import { filter, tap } from 'rxjs';
 
 @Component({
   selector: 'app-motorcycle-add',
@@ -42,7 +49,7 @@ import { SelectFieldsComponent } from '../../../../../shared/components/small/se
 
             <button
               type="button"
-              class="inline-flex h-9 w-8 items-center justify-center self-end rounded-md border text-lg transition-colors hover:bg-[#F4F4F5] disabled:pointer-events-none disabled:opacity-50">
+              class="inline-flex h-8 w-8 items-center justify-center self-end rounded-md border text-lg transition-colors hover:bg-[#F4F4F5] disabled:pointer-events-none disabled:opacity-50">
               <span>+</span>
             </button>
           </div>
@@ -70,10 +77,10 @@ import { SelectFieldsComponent } from '../../../../../shared/components/small/se
 export class MotorcycleAddComponent implements OnInit {
   private readonly _fb = inject(NonNullableFormBuilder);
   private readonly _brandService = inject(BrandService);
+  private readonly _modelService = inject(ModelService);
 
   brands = this._brandService.brands;
-
-  motorcycleForm = this._fb.group({});
+  models = this._modelService.models;
 
   selectFields = [
     {
@@ -82,6 +89,13 @@ export class MotorcycleAddComponent implements OnInit {
       entities: this.brands,
       messageSelect: 'Seleccione una marca',
       messageAlert: 'La marca es requerida',
+    },
+    {
+      title: 'Modelo',
+      controlKey: 'model',
+      entities: this.models,
+      messageSelect: 'Seleccione un modelo',
+      messageAlert: 'El modelo es requerido',
     },
   ];
 
@@ -102,15 +116,40 @@ export class MotorcycleAddComponent implements OnInit {
     },
   ];
 
+  motorcycleForm: FormGroup = this._fb.group({
+    brand: ['', Validators.required],
+    model: ['', Validators.required],
+  });
+
   ngOnInit(): void {
     this.loadBrands();
-  }
-
-  loadBrands(): void {
-    this._brandService.getBrands().subscribe();
+    this.setupBrandChangeListener();
   }
 
   onSubmit() {
-    console.log('test');
+    console.log(this.motorcycleForm.value);
+  }
+
+  private loadBrands(): void {
+    this._brandService.getBrands().subscribe();
+  }
+
+  private setupBrandChangeListener(): void {
+    const modelControl = this.motorcycleForm.get('model');
+    const brandControl = this.motorcycleForm.get('brand');
+
+    modelControl?.disable();
+
+    brandControl?.valueChanges
+      .pipe(
+        filter(Boolean),
+        tap(() => modelControl?.enable()),
+        tap((brandId) => this.loadModels(brandId))
+      )
+      .subscribe();
+  }
+
+  private loadModels(brandId: number): void {
+    this._modelService.getModelsByBrand(brandId).subscribe();
   }
 }
