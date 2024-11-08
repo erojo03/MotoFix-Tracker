@@ -21,8 +21,8 @@ interface Entity {
       {{ title }}
       <select
         [formControlName]="controlKey"
-        class="w-full rounded-md border px-3 py-2">
-        <option value="" disabled selected>Seleccionar rol</option>
+        class="w-full rounded-md border px-3 py-1.5">
+        <option value="" disabled selected>{{ messageSelect }}</option>
         @for (entity of entities(); track entity.id) {
           <option [value]="entity.id">{{ entity.name }}</option>
         }
@@ -30,6 +30,10 @@ interface Entity {
     </label>
   `,
   styles: `
+    :host {
+      flex: 1;
+    }
+
     @media (min-width: 640px) {
       :host {
         grid-column: span 2;
@@ -46,6 +50,7 @@ interface Entity {
 export class SelectFieldsComponent implements OnInit {
   @Input({ required: true }) title = '';
   @Input({ required: true }) controlKey = '';
+  @Input({ required: true }) messageSelect = '';
   entities = input<Entity[]>();
 
   private parentContainer = inject(ControlContainer);
