@@ -46,11 +46,15 @@ import { UserService } from '../../../../../core/services/data/user.service';
       <form
         [formGroup]="userForm"
         (ngSubmit)="onSubmit()"
-        class="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-4">
+        class="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
         @for (field of fields; track field.name) {
           <app-input-fields [field]="field" />
         }
-        <app-select-fields title="Rol" [entities]="roles()" controlKey="role" />
+        <app-select-fields
+          title="Rol"
+          [entities]="roles()"
+          controlKey="role"
+          messageSelect="Seleccione un Rol" />
       </form>
 
       <!-- Submit Button -->
@@ -79,28 +83,28 @@ export class UserAddComponent {
       label: 'Nombre',
       type: 'text',
       placeholder: 'Juan',
-      mensaje: 'Ingresa un nombre correcto',
+      message: 'Ingresa un nombre correcto',
     },
     {
       name: 'lastName',
       label: 'Apellido',
       type: 'text',
       placeholder: 'Pérez',
-      mensaje: 'Ingresa un apellido correcto',
+      message: 'Ingresa un apellido correcto',
     },
     {
       name: 'phone',
       label: 'Celular',
       type: 'tel',
       placeholder: '999 999 999',
-      mensaje: 'Ingresa un número de celular válido',
+      message: 'Ingresa un número de celular válido',
     },
     {
       name: 'password',
       label: 'Contraseña',
       type: 'password',
       placeholder: '••••••••',
-      mensaje: 'Ingresa una contraseña',
+      message: 'Ingresa una contraseña',
     },
   ];
 
