@@ -12,7 +12,7 @@ interface inputField {
   label: string;
   type: string;
   placeholder: string;
-  mensaje: string;
+  message: string;
 }
 
 @Component({
@@ -20,7 +20,7 @@ interface inputField {
   standalone: true,
   imports: [ReactiveFormsModule],
   template: `
-    <label [for]="field.name" class="flex flex-col gap-2 text-sm font-medium"
+    <label [for]="field.name" class="flex flex-col gap-1 text-sm font-medium"
       >{{ field.label }}
       <input
         [id]="field.name"
