@@ -4,7 +4,6 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { SubmitButtonComponent } from '../../shared/components/small/submit-button/submit-button.component';
 import { InputFieldsComponent } from '../../shared/components/small/input-fields/input-fields.component';
 import { AuthService } from '../../core/services/data/auth.service';
 import { Router } from '@angular/router';
@@ -12,7 +11,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, SubmitButtonComponent, InputFieldsComponent],
+  imports: [ReactiveFormsModule, InputFieldsComponent],
   template: `
     <main class="flex h-dvh flex-col items-center justify-center px-9">
       <img
@@ -64,14 +63,14 @@ export class LoginComponent {
       label: 'Celular',
       type: 'tel',
       placeholder: '999999999',
-      mensaje: 'Ingresa un numero correcto',
+      message: 'Ingresa un numero correcto',
     },
     {
       name: 'password',
       label: 'Contraseña',
       type: 'password',
       placeholder: '*********',
-      mensaje: 'Ingresa una contraseña valida',
+      message: 'Ingresa una contraseña valida',
     },
   ];
 
