@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { MotorcycleList } from '../interfaces/motorcycle.interface';
 import { environment } from '../../../../../environments/environment.development';
 
@@ -28,13 +28,15 @@ export class MotorcycleService {
     deliveryDate: string,
     userId: string
   ) {
-    return this._http.post(`${environment.API_URL}/motorcycle`, {
-      brandId,
-      modelId,
-      plate,
-      deliveryDate,
-      userId,
-    });
+    return this._http
+      .post(`${environment.API_URL}/motorcycle`, {
+        brandId,
+        modelId,
+        plate,
+        deliveryDate,
+        userId,
+      })
+      .pipe(switchMap(() => this.getMotos()));
   }
 
   updateMoto(
@@ -44,15 +46,19 @@ export class MotorcycleService {
     plate: string,
     deliveryDate: string
   ) {
-    return this._http.patch(`${environment.API_URL}/motorcycle/${id}`, {
-      brandId,
-      modelId,
-      plate,
-      deliveryDate,
-    });
+    return this._http
+      .patch(`${environment.API_URL}/motorcycle/${id}`, {
+        brandId,
+        modelId,
+        plate,
+        deliveryDate,
+      })
+      .pipe(switchMap(() => this.getMotos()));
   }
 
   removeMoto(id: number) {
-    return this._http.delete(`${environment.API_URL}/motorcycle/${id}`);
+    return this._http
+      .delete(`${environment.API_URL}/motorcycle/${id}`)
+      .pipe(switchMap(() => this.getMotos()));
   }
 }
