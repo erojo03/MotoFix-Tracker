@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { DatePipe } from '@angular/common';
@@ -11,6 +12,7 @@ import { MotorcycleService } from './services/motorcycle.service';
 import { PopupService } from '../../../core/services/utils/popup.service';
 import { MotorcycleAddComponent } from './components/motorcycle-add/motorcycle-add.component';
 import { BrandService } from './services/brand.service';
+import { FilterPipe } from '../../../shared/pipes/filter.pipe';
 
 @Component({
   selector: 'app-motorcycles',
@@ -21,6 +23,7 @@ import { BrandService } from './services/brand.service';
     DatePipe,
     MotorcycleItemComponent,
     MotorcycleAddComponent,
+    FilterPipe,
   ],
   template: `
     <!-- Header -->
@@ -32,13 +35,17 @@ import { BrandService } from './services/brand.service';
         </h1>
         <time class="font-medium">{{ date | date: 'dd / MM / yyyy' }}</time>
       </header>
-      <app-search-bar />
+      <app-search-bar [(searchValue)]="searchValue" />
     </section>
 
     <!-- Motorcycle List -->
     <section
       class="grid auto-rows-[166px] grid-cols-auto-fill-100 gap-4 overflow-y-auto pb-4">
-      @for (motorcycle of motorcycles(); track motorcycle.id) {
+      @for (
+        motorcycle of motorcycles()
+          | filter: searchValue() : ['plate', 'brand.name', 'model.name'];
+        track motorcycle.id
+      ) {
         <app-motorcycle-item [motorcycle]="motorcycle" />
       }
     </section>
@@ -84,6 +91,7 @@ export class MotorcyclesComponent implements OnInit {
   date = new Date();
   brands = this._brandService.brands;
   motorcycles = this._motorcycleService.motorcycles;
+  searchValue = signal('');
 
   ngOnInit(): void {
     this.loadMotorcycles();
