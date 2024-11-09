@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  input,
   OnInit,
 } from '@angular/core';
 import { CloseButtonComponent } from '../../../../../shared/components/small/close-button/close-button.component';
@@ -12,10 +13,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { InputFieldsComponent } from '../../../../../shared/components/small/input-fields/input-fields.component';
-import { BrandService } from '../../services/brand.service';
 import { SelectFieldsComponent } from '../../../../../shared/components/small/select-fields/select-fields.component';
 import { ModelService } from '../../services/model.service';
 import { filter, tap } from 'rxjs';
+import { MotorcycleService } from '../../services/motorcycle.service';
+import { PopupService } from '../../../../../core/services/utils/popup.service';
+import { Brand } from '../../interfaces/brand.interface';
+import { CurrentUserService } from '../../../../../core/services/data/current-user.service';
 
 @Component({
   selector: 'app-motorcycle-add',
@@ -75,11 +79,14 @@ import { filter, tap } from 'rxjs';
   `,
 })
 export class MotorcycleAddComponent implements OnInit {
-  private readonly _fb = inject(NonNullableFormBuilder);
-  private readonly _brandService = inject(BrandService);
-  private readonly _modelService = inject(ModelService);
+  brands = input.required<Brand[]>();
 
-  brands = this._brandService.brands;
+  private readonly _fb = inject(NonNullableFormBuilder);
+  private readonly _motorcycleService = inject(MotorcycleService);
+  private readonly _modelService = inject(ModelService);
+  private readonly _popupService = inject(PopupService);
+  private _currentUser = inject(CurrentUserService);
+
   models = this._modelService.models;
 
   selectFields = [
@@ -122,16 +129,36 @@ export class MotorcycleAddComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadBrands();
     this.setupBrandChangeListener();
   }
 
   onSubmit() {
     console.log(this.motorcycleForm.value);
-  }
+    if (this.motorcycleForm.invalid) {
+      this.motorcycleForm.markAllAsTouched();
+      return;
+    }
 
-  private loadBrands(): void {
-    this._brandService.getBrands().subscribe();
+    const { brand, model, plate, datetime } = this.motorcycleForm.getRawValue();
+    const isoDatetime = new Date(datetime).toISOString();
+
+    this._motorcycleService
+      .addMoto(
+        Number(brand),
+        Number(model),
+        plate,
+        isoDatetime,
+        this._currentUser.id
+      )
+      .subscribe({
+        next: () => {
+          this._popupService.closePopup('motorcycleAdd');
+        },
+        error: (error) => {
+          // this.errorRegister = true;
+          console.error('Error al registrar la moto:', error);
+        },
+      });
   }
 
   private setupBrandChangeListener(): void {
