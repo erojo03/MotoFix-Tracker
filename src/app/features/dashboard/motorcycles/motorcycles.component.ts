@@ -1,13 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { DatePipe } from '@angular/common';
 import { MotorcycleItemComponent } from './components/motorcycle-item/motorcycle-item.component';
 import { MotorcycleService } from './services/motorcycle.service';
 import { PopupService } from '../../../core/services/utils/popup.service';
 import { MotorcycleAddComponent } from './components/motorcycle-add/motorcycle-add.component';
+import { BrandService } from './services/brand.service';
 
 @Component({
   selector: 'app-motorcycles',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
     SearchBarComponent,
@@ -56,7 +63,7 @@ import { MotorcycleAddComponent } from './components/motorcycle-add/motorcycle-a
 
     <!-- Motorcycle Add -->
     @if (popupState('motorcycleAdd')) {
-      <app-motorcycle-add />
+      <app-motorcycle-add [brands]="brands()"/>
     }
   `,
   styles: `
@@ -70,17 +77,24 @@ import { MotorcycleAddComponent } from './components/motorcycle-add/motorcycle-a
 })
 export class MotorcyclesComponent implements OnInit {
   private readonly _motorcycleService = inject(MotorcycleService);
+  private readonly _brandService = inject(BrandService);
   private readonly _popupService = inject(PopupService);
 
   date = new Date();
+  brands = this._brandService.brands;
   motorcycles = this._motorcycleService.motorcycles;
 
   ngOnInit(): void {
     this.loadMotorcycles();
+    this.loadBrands();
   }
 
   loadMotorcycles() {
     this._motorcycleService.getMotos().subscribe();
+  }
+
+  private loadBrands(): void {
+    this._brandService.getBrands().subscribe();
   }
 
   openPopup(key: string): void {
