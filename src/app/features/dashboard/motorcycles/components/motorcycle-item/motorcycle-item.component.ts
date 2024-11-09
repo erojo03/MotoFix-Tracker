@@ -114,9 +114,7 @@ interface CurrentProcess {
             <circle cx="17" cy="18" r="2"></circle>
             <circle cx="7" cy="18" r="2"></circle>
           </svg>
-          <span class="text-sm">{{
-            deliveryDate | date: 'dd/MM/yyyy' || 'N/A'
-          }}</span>
+          <span class="text-sm">{{ deliveryDate | date: 'dd/MM/yyyy' }}</span>
         </div>
 
         <div class="flex items-center">
@@ -134,9 +132,7 @@ interface CurrentProcess {
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          <span class="text-sm">{{
-            deliveryDate | date: 'hh:mm a' || 'N/A'
-          }}</span>
+          <span class="text-sm">{{ deliveryDate | date: 'hh:mm a' }}</span>
         </div>
       </div>
     </div>
