@@ -36,7 +36,8 @@ import { BrandService } from './services/brand.service';
     </section>
 
     <!-- Motorcycle List -->
-    <section class="grid auto-rows-[166px] grid-cols-auto-fill-100 gap-4">
+    <section
+      class="grid auto-rows-[166px] grid-cols-auto-fill-100 gap-4 overflow-y-auto pb-4">
       @for (motorcycle of motorcycles(); track motorcycle.id) {
         <app-motorcycle-item [motorcycle]="motorcycle" />
       }
@@ -63,7 +64,7 @@ import { BrandService } from './services/brand.service';
 
     <!-- Motorcycle Add -->
     @if (popupState('motorcycleAdd')) {
-      <app-motorcycle-add [brands]="brands()"/>
+      <app-motorcycle-add [brands]="brands()" />
     }
   `,
   styles: `
