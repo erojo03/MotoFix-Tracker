@@ -11,6 +11,7 @@ import { UserTableComponent } from './components/user-table/user-table.component
 import { BreakpointService } from '../../../core/services/utils/breakpoints.service';
 import { map, Observable } from 'rxjs';
 import { UserEditComponent } from './components/user-edit/user-edit.component';
+import { FilterPipe } from '../../../shared/pipes/filter.pipe';
 
 @Component({
   selector: 'app-users',
@@ -22,6 +23,7 @@ import { UserEditComponent } from './components/user-edit/user-edit.component';
     UserItemComponent,
     UserTableComponent,
     UserEditComponent,
+    FilterPipe,
   ],
   template: `
     @let isMobile = isMobile$ | async;
@@ -30,7 +32,7 @@ import { UserEditComponent } from './components/user-edit/user-edit.component';
       class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
       <h1 class="text-2xl font-extrabold text-primary">USUARIOS</h1>
       <div class="flex flex-col gap-2.5 md:flex-row-reverse">
-        <app-search-bar />
+        <app-search-bar [(searchValue)]="searchValue" />
 
         <!-- Header Buttons -->
         <div class="flex flex-shrink-0 gap-2.5">
@@ -80,8 +82,10 @@ import { UserEditComponent } from './components/user-edit/user-edit.component';
     <!-- Main -->
     <section
       class="flex flex-grow flex-col items-center gap-3 overflow-y-auto pb-4">
+      @let filteredUsers =
+        users() | filter: searchValue() : ['firstName', 'lastName', 'phone'];
       @if (isMobile) {
-        @for (user of users(); track user.id) {
+        @for (user of filteredUsers; track user.id) {
           <app-user-item
             [(userId)]="userId"
             [user]="user"
@@ -91,7 +95,7 @@ import { UserEditComponent } from './components/user-edit/user-edit.component';
       } @else {
         <app-user-table
           [(userId)]="userId"
-          [users]="users()"
+          [users]="filteredUsers"
           (openEdit)="openPopup('editUser')"
           (delete)="deleteUser($event)" />
       }
@@ -126,6 +130,7 @@ export class UsersComponent implements OnInit {
   users = this._userService.users;
   roles = toSignal(this._roleService.getRoles());
   userId = signal('');
+  searchValue = signal('');
 
   user = computed(() => this.users().find((user) => user.id === this.userId()));
 
