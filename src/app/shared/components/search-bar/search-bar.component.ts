@@ -26,7 +26,7 @@ import { Component, Input, model } from '@angular/core';
 })
 export class SearchBarComponent {
   @Input() placeholder = '';
-  searchValue = model<string>();
+  searchValue = model.required<string>();
 
   onSearchInputChange(event: KeyboardEvent) {
     const inputValue = (event.target as HTMLInputElement).value;
