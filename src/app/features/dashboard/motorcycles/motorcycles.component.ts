@@ -13,6 +13,11 @@ import { PopupService } from '../../../core/services/utils/popup.service';
 import { MotorcycleAddComponent } from './components/motorcycle-add/motorcycle-add.component';
 import { BrandService } from './services/brand.service';
 import { FilterPipe } from '../../../shared/pipes/filter.pipe';
+import { MotorcycleProcessComponent } from './components/motorcycle-process/motorcycle-process.component';
+import {
+  MotorcycleInfo,
+  MotorcycleList,
+} from './interfaces/motorcycle.interface';
 
 @Component({
   selector: 'app-motorcycles',
@@ -24,6 +29,7 @@ import { FilterPipe } from '../../../shared/pipes/filter.pipe';
     MotorcycleItemComponent,
     MotorcycleAddComponent,
     FilterPipe,
+    MotorcycleProcessComponent,
   ],
   template: `
     <!-- Header -->
@@ -46,7 +52,10 @@ import { FilterPipe } from '../../../shared/pipes/filter.pipe';
           | filter: searchValue() : ['plate', 'brand.name', 'model.name'];
         track motorcycle.id
       ) {
-        <app-motorcycle-item [motorcycle]="motorcycle" />
+        <app-motorcycle-item
+          [motorcycle]="motorcycle"
+          (click)="openPopup('motorcycleProcesses')"
+          (click)="getMotorcycleForProcess(motorcycle)" />
       }
     </section>
 
@@ -54,7 +63,7 @@ import { FilterPipe } from '../../../shared/pipes/filter.pipe';
     <button
       (click)="openPopup('motorcycleAdd')"
       class="absolute bottom-[26px] right-1/2 translate-x-1/2 rounded-full bg-red-500 p-3 text-white shadow-lg duration-300 hover:rotate-90 md:bottom-0 md:right-0 md:m-8 md:translate-x-0"
-      aria-label="close form">
+      aria-label="add">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -72,6 +81,11 @@ import { FilterPipe } from '../../../shared/pipes/filter.pipe';
     <!-- Motorcycle Add -->
     @if (popupState('motorcycleAdd')) {
       <app-motorcycle-add [brands]="brands()" />
+    }
+
+    <!-- Motorcycle Processes -->
+    @if (popupState('motorcycleProcesses')) {
+      <app-motorcycle-process [motorcycleInfo]="motorcycleForProcess()" />
     }
   `,
   styles: `
@@ -91,6 +105,11 @@ export class MotorcyclesComponent implements OnInit {
   date = new Date();
   brands = this._brandService.brands;
   motorcycles = this._motorcycleService.motorcycles;
+  motorcycleForProcess = signal<MotorcycleInfo>({
+    id: 0,
+    brand: '',
+    plate: '',
+  });
   searchValue = signal('');
 
   ngOnInit(): void {
@@ -98,12 +117,10 @@ export class MotorcyclesComponent implements OnInit {
     this.loadBrands();
   }
 
-  loadMotorcycles() {
-    this._motorcycleService.getMotos().subscribe();
-  }
-
-  private loadBrands(): void {
-    this._brandService.getBrands().subscribe();
+  getMotorcycleForProcess(motorcycle: MotorcycleList) {
+    const { id, brand, plate } = motorcycle;
+    const data = { id, brand: brand.name, plate };
+    this.motorcycleForProcess.set(data);
   }
 
   openPopup(key: string): void {
@@ -113,5 +130,13 @@ export class MotorcyclesComponent implements OnInit {
   popupState(key: string): boolean {
     const state = this._popupService.getPopupState(key);
     return state();
+  }
+
+  private loadMotorcycles() {
+    this._motorcycleService.getMotos().subscribe();
+  }
+
+  private loadBrands(): void {
+    this._brandService.getBrands().subscribe();
   }
 }

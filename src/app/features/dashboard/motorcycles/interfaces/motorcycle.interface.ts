@@ -17,3 +17,9 @@ export interface MotorcycleList {
     startDate: Date;
   };
 }
+
+export interface MotorcycleInfo {
+  id: number;
+  brand: string;
+  plate: string;
+}
