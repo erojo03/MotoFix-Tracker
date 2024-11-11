@@ -1,10 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PopupService {
   private _popups: Record<string, ReturnType<typeof signal<boolean>>> = {};
+
+  private _isClosing = signal(false);
+
+  get isClosingPopup() {
+    return this._isClosing;
+  }
 
   getPopupState(key: string) {
     if (!this._popups[key]) {
@@ -18,7 +24,12 @@ export class PopupService {
   }
 
   closePopup(key: string) {
-    this.getPopupState(key).set(false);
+    this.isClosingPopup.set(true);
+
+    setTimeout(() => {
+      this.getPopupState(key).set(false);
+      this.isClosingPopup.set(false);
+    }, 300); // Wait for the animation to complete
   }
 
   togglePopup(key: string) {
