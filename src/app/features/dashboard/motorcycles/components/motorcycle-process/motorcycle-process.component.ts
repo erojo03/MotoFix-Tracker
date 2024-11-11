@@ -3,6 +3,8 @@ import { CloseButtonComponent } from '../../../../../shared/components/small/clo
 import { DatePipe } from '@angular/common';
 import { MotorcycleProcessService } from '../../services/motorcycle-process.service';
 import { MotorcycleInfo } from '../../interfaces/motorcycle.interface';
+import { MotorcycleService } from '../../services/motorcycle.service';
+import { PopupService } from '../../../../../core/services/utils/popup.service';
 
 @Component({
   selector: 'app-motorcycle-process',
@@ -10,7 +12,8 @@ import { MotorcycleInfo } from '../../interfaces/motorcycle.interface';
   imports: [CloseButtonComponent, DatePipe],
   template: `
     <section
-      class="relative flex h-full w-full flex-col items-center gap-4 bg-white p-6 shadow-2xl md:h-3/4 md:w-3/5 md:rounded-2xl">
+      [class.animate-slide-out]="isClosingPopup()"
+      class="animate-slide-in relative flex h-full w-full flex-col items-center gap-4 bg-white p-6 shadow-2xl md:h-3/4 md:w-3/5 md:rounded-2xl">
       <app-close-button popupId="motorcycleProcesses" />
 
       <!-- Title -->
@@ -50,8 +53,7 @@ import { MotorcycleInfo } from '../../interfaces/motorcycle.interface';
           <li class="relative flex gap-6">
             @if ($index !== $count - 1) {
               <div
-                class="absolute left-8 top-14 -ml-0.5 mt-0.5 h-full w-px border-l-4 border-dotted border-gray-300"
-                aria-hidden="true"></div>
+                class="absolute left-8 top-14 -ml-0.5 mt-0.5 h-full w-px border-l-4 border-dotted border-gray-300"></div>
             }
             <div
               class="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-white shadow">
@@ -156,6 +158,7 @@ import { MotorcycleInfo } from '../../interfaces/motorcycle.interface';
         </button>
 
         <button
+          (click)="deleteMotorcycle()"
           class="button group relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-none bg-rose-600 font-semibold shadow-lg transition-all duration-300 hover:w-24 hover:rounded-full hover:bg-rose-500">
           <svg
             viewBox="0 0 448 512"
@@ -182,12 +185,15 @@ export class MotorcycleProcessComponent implements OnInit {
   motorcycleInfo = input.required<MotorcycleInfo>({});
 
   private readonly _motorcycleProcessService = inject(MotorcycleProcessService);
+  private readonly _motorcycleService = inject(MotorcycleService);
+  private readonly _popupService = inject(PopupService);
 
   motorcycleTitle = computed(
     () => this.motorcycleInfo().brand + ' ' + this.motorcycleInfo().plate
   );
 
   motorcycleProcesses = this._motorcycleProcessService.processes;
+  isClosingPopup = this._popupService.isClosingPopup;
 
   ngOnInit() {
     this.loadProcesses();
@@ -197,5 +203,19 @@ export class MotorcycleProcessComponent implements OnInit {
     this._motorcycleProcessService
       .getProcesses(this.motorcycleInfo().id)
       .subscribe();
+  }
+
+  deleteMotorcycle(): void {
+    const id = this.motorcycleInfo().id;
+    this._motorcycleService.removeMoto(id).subscribe({
+      next: () => {
+        this._popupService.closePopup('motorcycleProcesses');
+      },
+      error: (error) =>
+        console.error(
+          'Error al eliminar la moto: ',
+          error.error?.message || error
+        ),
+    });
   }
 }
