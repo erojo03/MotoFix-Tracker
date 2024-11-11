@@ -33,7 +33,8 @@ import { CurrentUserService } from '../../../../../core/services/data/current-us
   ],
   template: `
     <section
-      class="relative flex w-[435px] flex-col gap-4 rounded-lg bg-white p-6 shadow-md">
+      [class.animate-add-slide-out]="isClosingPopup()"
+      class="animate-add-slide-in relative flex w-[435px] flex-col gap-4 rounded-lg bg-white p-6 shadow-md">
       <app-close-button popupId="motorcycleAdd" />
 
       <h1 class="text-center text-2xl font-bold text-gray-800">
@@ -88,6 +89,7 @@ export class MotorcycleAddComponent implements OnInit {
   private _currentUser = inject(CurrentUserService);
 
   models = this._modelService.models;
+  isClosingPopup = this._popupService.isClosingPopup;
 
   selectFields = [
     {
