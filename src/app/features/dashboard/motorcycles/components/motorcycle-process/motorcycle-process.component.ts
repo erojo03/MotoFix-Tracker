@@ -5,6 +5,7 @@ import { MotorcycleProcessService } from '../../services/motorcycle-process.serv
 import { MotorcycleInfo } from '../../interfaces/motorcycle.interface';
 import { MotorcycleService } from '../../services/motorcycle.service';
 import { PopupService } from '../../../../../core/services/utils/popup.service';
+import { CurrentUserService } from '../../../../../core/services/data/current-user.service';
 
 @Component({
   selector: 'app-motorcycle-process',
@@ -86,7 +87,8 @@ import { PopupService } from '../../../../../core/services/utils/popup.service';
               <!-- Text for Received -->
               @if (
                 (process.sequence % 2 !== 0 || process.sequence === 4) &&
-                process.sequence !== 3
+                process.sequence !== 3 &&
+                user
               ) {
                 @let userShortName =
                   user.firstName.split(' ')[0] +
@@ -137,6 +139,7 @@ import { PopupService } from '../../../../../core/services/utils/popup.service';
       <!-- limitar el boton cuando llegue a la ultima secuencia -->
       <div class="flex gap-2 self-end">
         <button
+          (click)="confirmProcess()"
           class="button group relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-none bg-emerald-600 font-semibold shadow-lg transition-all duration-300 hover:w-32 hover:rounded-full hover:bg-emerald-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -186,23 +189,43 @@ export class MotorcycleProcessComponent implements OnInit {
 
   private readonly _motorcycleProcessService = inject(MotorcycleProcessService);
   private readonly _motorcycleService = inject(MotorcycleService);
+  private readonly _currentUserService = inject(CurrentUserService);
   private readonly _popupService = inject(PopupService);
 
   motorcycleTitle = computed(
     () => this.motorcycleInfo().brand + ' ' + this.motorcycleInfo().plate
   );
 
+  userId?: string;
   motorcycleProcesses = this._motorcycleProcessService.processes;
   isClosingPopup = this._popupService.isClosingPopup;
 
   ngOnInit() {
-    this.loadProcesses();
+    this.loadProcesses(this.motorcycleInfo().id);
   }
 
-  loadProcesses() {
+  loadProcesses(id: number) {
+    this._motorcycleProcessService.getProcesses(id).subscribe();
+  }
+
+  confirmProcess() {
+    const currentSequence =
+      this.motorcycleProcesses()[this.motorcycleProcesses().length - 1].process
+        .sequence;
+    this.userId = this.determineUserId(currentSequence);
+
+    console.log(this.userId);
+
     this._motorcycleProcessService
-      .getProcesses(this.motorcycleInfo().id)
-      .subscribe();
+      .completeProcess(this.motorcycleInfo().id, currentSequence, this.userId)
+      .subscribe({
+        next: () => {
+          this.loadProcesses(this.motorcycleInfo().id);
+          console.log('Process Complete Successfully');
+        },
+        error: (error) =>
+          this.handleError('Error al actualizar el proceso', error),
+      });
   }
 
   deleteMotorcycle(): void {
@@ -211,11 +234,18 @@ export class MotorcycleProcessComponent implements OnInit {
       next: () => {
         this._popupService.closePopup('motorcycleProcesses');
       },
-      error: (error) =>
-        console.error(
-          'Error al eliminar la moto: ',
-          error.error?.message || error
-        ),
+      error: (error) => this.handleError('Error al eliminar la moto', error),
     });
+  }
+
+  private determineUserId(sequence: number): string | undefined {
+    if (sequence % 2 === 0) return this._currentUserService.id;
+    // if (sequence === 3 && this.mechanicId) return this.userId;
+    return undefined;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private handleError(message: string, error: any): void {
+    console.error(`${message}:`, error.error?.message || error);
   }
 }
