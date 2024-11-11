@@ -1,6 +1,6 @@
 export interface MotorcycleProcess {
   motorcycleId: number;
-  user: User;
+  user?: User;
   startDate: Date;
   endDate: Date;
   process: Process;
