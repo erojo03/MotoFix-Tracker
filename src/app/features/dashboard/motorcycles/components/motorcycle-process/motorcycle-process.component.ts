@@ -6,6 +6,8 @@ import { MotorcycleInfo } from '../../interfaces/motorcycle.interface';
 import { MotorcycleService } from '../../services/motorcycle.service';
 import { PopupService } from '../../../../../core/services/utils/popup.service';
 import { CurrentUserService } from '../../../../../core/services/data/current-user.service';
+import { UserService } from '../../../../../core/services/data/user.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-motorcycle-process',
@@ -123,12 +125,27 @@ import { CurrentUserService } from '../../../../../core/services/data/current-us
                 <div
                   class="flex flex-wrap items-center gap-2 text-base text-gray-600">
                   <h3>Mecanicos disponibles:</h3>
-                  <select class="w-max rounded-lg px-2 py-1">
+                  <select
+                    (change)="setMechanicId($event)"
+                    class="w-max rounded-lg px-2 py-1">
                     <option value="" selected disabled>
                       Elije un Mecanico
                     </option>
+                    @for (mechanic of mechanicsAvailable(); track mechanic.id) {
+                      @let userShortName =
+                        mechanic.firstName.split(' ')[0] +
+                        ' ' +
+                        mechanic.lastName.split(' ')[0];
+                      <option value="{{ mechanic.id }}">
+                        {{ userShortName }}
+                      </option>
+                    }
                   </select>
                 </div>
+
+                @if (!mechanicSelected) {
+                  <span class="text-red-400">Selecciona un Mecanico</span>
+                }
               }
             </div>
           </li>
@@ -189,6 +206,7 @@ export class MotorcycleProcessComponent implements OnInit {
 
   private readonly _motorcycleProcessService = inject(MotorcycleProcessService);
   private readonly _motorcycleService = inject(MotorcycleService);
+  private readonly _userService = inject(UserService);
   private readonly _currentUserService = inject(CurrentUserService);
   private readonly _popupService = inject(PopupService);
 
@@ -196,12 +214,19 @@ export class MotorcycleProcessComponent implements OnInit {
     () => this.motorcycleInfo().brand + ' ' + this.motorcycleInfo().plate
   );
 
-  userId?: string;
+  mechanicId?: string;
+  mechanicSelected = true;
+  mechanicsAvailable = toSignal(this._userService.getAvailableMechanics());
   motorcycleProcesses = this._motorcycleProcessService.processes;
   isClosingPopup = this._popupService.isClosingPopup;
 
   ngOnInit() {
     this.loadProcesses(this.motorcycleInfo().id);
+  }
+
+  setMechanicId(event: Event): void {
+    this.mechanicSelected = true;
+    this.mechanicId = (event.target as HTMLSelectElement).value;
   }
 
   loadProcesses(id: number) {
@@ -212,12 +237,16 @@ export class MotorcycleProcessComponent implements OnInit {
     const currentSequence =
       this.motorcycleProcesses()[this.motorcycleProcesses().length - 1].process
         .sequence;
-    this.userId = this.determineUserId(currentSequence);
 
-    console.log(this.userId);
+    const userId = this.determineUserId(currentSequence);
+
+    if (currentSequence === 3 && !this.mechanicId) {
+      this.mechanicSelected = false;
+      return;
+    }
 
     this._motorcycleProcessService
-      .completeProcess(this.motorcycleInfo().id, currentSequence, this.userId)
+      .completeProcess(this.motorcycleInfo().id, currentSequence, userId)
       .subscribe({
         next: () => {
           this.loadProcesses(this.motorcycleInfo().id);
@@ -240,7 +269,7 @@ export class MotorcycleProcessComponent implements OnInit {
 
   private determineUserId(sequence: number): string | undefined {
     if (sequence % 2 === 0) return this._currentUserService.id;
-    // if (sequence === 3 && this.mechanicId) return this.userId;
+    if (sequence === 3 && this.mechanicId) return this.mechanicId;
     return undefined;
   }
 
