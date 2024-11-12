@@ -9,6 +9,7 @@ import { PopupService } from '../../../../core/services/utils/popup.service';
     <button
       (click)="close(popupId)"
       aria-label="Cerrar formulario"
+      type="button"
       class="size-10 transform rounded-full bg-gray-100 text-gray-600 transition-all duration-300 ease-in-out hover:rotate-90 hover:scale-110 hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +25,7 @@ import { PopupService } from '../../../../core/services/utils/popup.service';
       </svg>
     </button>
   `,
-  styles: ` 
+  styles: `
     :host {
       position: absolute;
       right: 1.4rem;
