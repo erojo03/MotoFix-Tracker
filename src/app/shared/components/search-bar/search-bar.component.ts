@@ -20,7 +20,7 @@ import { Component, Input, model } from '@angular/core';
   `,
   styles: `
     :host {
-      @apply relative w-full md:max-w-96;
+      @apply relative w-full md:w-72;
     }
   `,
 })
