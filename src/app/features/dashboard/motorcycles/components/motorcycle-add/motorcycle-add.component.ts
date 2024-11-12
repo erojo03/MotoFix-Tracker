@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   input,
+  model,
   OnInit,
 } from '@angular/core';
 import { CloseButtonComponent } from '../../../../../shared/components/small/close-button/close-button.component';
@@ -81,6 +82,7 @@ import { CurrentUserService } from '../../../../../core/services/data/current-us
 })
 export class MotorcycleAddComponent implements OnInit {
   brands = input.required<Brand[]>();
+  activeTab = model<'today' | 'other'>();
 
   private readonly _fb = inject(NonNullableFormBuilder);
   private readonly _motorcycleService = inject(MotorcycleService);
@@ -154,6 +156,7 @@ export class MotorcycleAddComponent implements OnInit {
       )
       .subscribe({
         next: () => {
+          this.activeTab.set('today');
           this._popupService.closePopup('motorcycleAdd');
         },
         error: (error) => {
