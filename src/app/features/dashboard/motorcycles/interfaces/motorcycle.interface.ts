@@ -9,8 +9,8 @@ export interface MotorcycleList {
     name: string;
   };
   plate: string;
-  arrivalDate: Date;
-  deliveryDate: Date;
+  arrivalDate: string;
+  deliveryDate: string;
   currentProcess: {
     description: string;
     sequence: number;
