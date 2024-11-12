@@ -34,29 +34,90 @@ import {
   template: `
     <!-- Header -->
     <section
-      class="flex flex-col items-center gap-2.5 md:flex-row md:justify-between">
-      <header class="w-full">
+      class="flex flex-col items-center gap-3 md:flex-row md:justify-between">
+      <header class="w-full md:w-auto">
         <h1 class="text-[1.4rem] font-extrabold text-primary">
           ATENCIONES MECANICAS
         </h1>
         <time class="font-medium">{{ date | date: 'dd / MM / yyyy' }}</time>
       </header>
+      <div class="flex w-full self-center rounded-lg bg-gray-200 md:w-auto">
+        <button
+          (click)="setActiveTab('today')"
+          [class]="activeTab === 'today' ? 'bg-[#132c6b] text-white' : ''"
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg px-3 py-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-5 w-5">
+            <path d="M8 2v4"></path>
+            <path d="M16 2v4"></path>
+            <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+            <path d="M3 10h18"></path>
+          </svg>
+          hoy
+        </button>
+        <button
+          (click)="setActiveTab('other')"
+          [class]="activeTab === 'other' ? 'bg-[#132c6b] text-white' : ''"
+          class="flex flex-1 items-center justify-center gap-1 rounded-lg px-3 py-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-5 w-5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          otros
+        </button>
+      </div>
       <app-search-bar [(searchValue)]="searchValue" />
     </section>
 
     <!-- Motorcycle List -->
-    <section
-      class="grid auto-rows-[166px] grid-cols-auto-fill-100 gap-4 overflow-y-auto pb-4">
-      @for (
-        motorcycle of motorcycles()
-          | filter: searchValue() : ['plate', 'brand.name', 'model.name'];
-        track motorcycle.id
-      ) {
-        <app-motorcycle-item
-          [motorcycle]="motorcycle"
-          (click)="openPopup('motorcycleProcesses')"
-          (click)="getMotorcycleForProcess(motorcycle)" />
-      }
+    <section class="flex flex-col gap-4">
+      <div
+        class="grid flex-1 auto-rows-[166px] grid-cols-auto-fill-100 gap-4 overflow-y-auto pb-4">
+        @for (
+          motorcycle of motorcycles()
+            | filter: searchValue() : ['plate', 'brand.name', 'model.name'];
+          track motorcycle.id
+        ) {
+          @if (
+            getDay(motorcycle.arrivalDate) === date.getDate() &&
+            activeTab === 'today'
+          ) {
+            <app-motorcycle-item
+              [motorcycle]="motorcycle"
+              (click)="openPopup('motorcycleProcesses')"
+              (click)="setMotorcycleForProcess(motorcycle)" />
+          }
+
+          @if (
+            getDay(motorcycle.arrivalDate) !== date.getDate() &&
+            activeTab === 'other'
+          ) {
+            <app-motorcycle-item
+              [motorcycle]="motorcycle"
+              (click)="openPopup('motorcycleProcesses')"
+              (click)="setMotorcycleForProcess(motorcycle)" />
+          }
+        }
+      </div>
     </section>
 
     <!-- Add Button -->
@@ -80,7 +141,7 @@ import {
 
     <!-- Motorcycle Add -->
     @if (popupState('motorcycleAdd')) {
-      <app-motorcycle-add [brands]="brands()" />
+      <app-motorcycle-add [brands]="brands()" [(activeTab)]="activeTab" />
     }
 
     <!-- Motorcycle Processes -->
@@ -92,7 +153,7 @@ import {
     :host {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
       height: 100%;
     }
   `,
@@ -111,13 +172,23 @@ export class MotorcyclesComponent implements OnInit {
     plate: '',
   });
   searchValue = signal('');
+  activeTab: 'today' | 'other' = 'today';
+
+  getDay(ISOdate: string) {
+    const date = new Date(ISOdate);
+    return date.getDate();
+  }
+
+  setActiveTab(tab: 'today' | 'other') {
+    this.activeTab = tab;
+  }
 
   ngOnInit(): void {
     this.loadMotorcycles();
     this.loadBrands();
   }
 
-  getMotorcycleForProcess(motorcycle: MotorcycleList) {
+  setMotorcycleForProcess(motorcycle: MotorcycleList) {
     const { id, brand, plate } = motorcycle;
     const data = { id, brand: brand.name, plate };
     this.motorcycleForProcess.set(data);
