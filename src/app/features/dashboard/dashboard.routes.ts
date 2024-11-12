@@ -1,4 +1,4 @@
-import { Routes } from "@angular/router"
+import { Routes } from '@angular/router';
 
 export default [
   {
@@ -33,4 +33,4 @@ export default [
         (m) => m.UsersComponent
       ),
   },
- ] as Routes
+ ] as Routes;
