@@ -3,7 +3,7 @@ import { RoleService } from './role.service';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, switchMap, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
-import { User, UserList } from '../../interfaces/user.interface';
+import { mechanics, User, UserList } from '../../interfaces/user.interface';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -38,6 +38,12 @@ export class UserService {
 
   getUserById(id: string): Observable<User> {
     return this._http.get<User>(`${environment.API_URL}/users/${id}`);
+  }
+
+  getAvailableMechanics(): Observable<mechanics[]> {
+    return this._http.get<mechanics[]>(
+      `${environment.API_URL}/users/mechanics-available`
+    );
   }
 
   createUser(

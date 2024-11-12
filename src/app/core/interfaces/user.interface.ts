@@ -17,3 +17,7 @@ export interface User extends UserBase {
   password: string;
   roleId: number;
 }
+
+export interface mechanics extends UserBase {
+  roleId: number;
+}
