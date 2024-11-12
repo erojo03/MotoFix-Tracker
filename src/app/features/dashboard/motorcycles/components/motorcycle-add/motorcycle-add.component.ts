@@ -21,6 +21,8 @@ import { MotorcycleService } from '../../services/motorcycle.service';
 import { PopupService } from '../../../../../core/services/utils/popup.service';
 import { Brand } from '../../interfaces/brand.interface';
 import { CurrentUserService } from '../../../../../core/services/data/current-user.service';
+import { BrandAddComponent } from './brand-add/brand-add.component';
+import { ModelAddComponent } from './model-add/model-add.component';
 
 @Component({
   selector: 'app-motorcycle-add',
@@ -31,10 +33,12 @@ import { CurrentUserService } from '../../../../../core/services/data/current-us
     CloseButtonComponent,
     InputFieldsComponent,
     SelectFieldsComponent,
+    BrandAddComponent,
+    ModelAddComponent,
   ],
   template: `
     <section
-      [class.animate-add-slide-out]="isClosingPopup()"
+      [class.animate-add-slide-out]="isClosingPopup"
       class="animate-add-slide-in relative flex w-[435px] flex-col gap-4 rounded-lg bg-white p-6 shadow-md">
       <app-close-button popupId="motorcycleAdd" />
 
@@ -55,7 +59,9 @@ import { CurrentUserService } from '../../../../../core/services/data/current-us
 
             <button
               type="button"
-              class="inline-flex h-8 w-8 items-center justify-center self-end rounded-md border text-lg transition-colors hover:bg-[#F4F4F5] disabled:pointer-events-none disabled:opacity-50">
+              (click)="open(field.openKey)"
+              [disabled]="isModelDisabled(field.controlKey)"
+              class="inline-flex h-8 w-8 items-center justify-center self-end rounded-md border text-lg transition-colors hover:bg-[#F4F4F5] disabled:cursor-not-allowed disabled:opacity-50">
               <span>+</span>
             </button>
           </div>
@@ -73,6 +79,14 @@ import { CurrentUserService } from '../../../../../core/services/data/current-us
         </button>
       </form>
     </section>
+
+    @if (popupState('brandAdd')) {
+      <app-brand-add />
+    }
+
+    @if (popupState('modelAdd')) {
+      <app-model-add [brand]="brandSelected" />
+    }
   `,
   styles: `
     :host {
@@ -90,14 +104,22 @@ export class MotorcycleAddComponent implements OnInit {
   private readonly _popupService = inject(PopupService);
   private _currentUser = inject(CurrentUserService);
 
+  brandSelected: Brand = { id: 0, name: '' };
   models = this._modelService.models;
-  isClosingPopup = this._popupService.isClosingPopup;
+
+  get isClosingPopup(): boolean {
+    if (this.popupState('brandAdd') || this.popupState('modelAdd')) {
+      return false;
+    }
+    return this._popupService.isClosingPopup();
+  }
 
   selectFields = [
     {
       title: 'Marcas',
       controlKey: 'brand',
       entities: this.brands,
+      openKey: 'brandAdd',
       messageSelect: 'Seleccione una marca',
       messageAlert: 'La marca es requerida',
     },
@@ -105,6 +127,7 @@ export class MotorcycleAddComponent implements OnInit {
       title: 'Modelo',
       controlKey: 'model',
       entities: this.models,
+      openKey: 'modelAdd',
       messageSelect: 'Seleccione un modelo',
       messageAlert: 'El modelo es requerido',
     },
@@ -136,8 +159,24 @@ export class MotorcycleAddComponent implements OnInit {
     this.setupBrandChangeListener();
   }
 
+  open(key: string): void {
+    this._popupService.openPopup(key);
+  }
+
+  popupState(key: string): boolean {
+    const state = this._popupService.getPopupState(key);
+    return state();
+  }
+
+  isModelDisabled(controlKey: string): boolean {
+    if (controlKey !== 'model') {
+      return false;
+    }
+    const modelControl = this.motorcycleForm.get('model');
+    return modelControl ? modelControl.disabled : true;
+  }
+
   onSubmit() {
-    console.log(this.motorcycleForm.value);
     if (this.motorcycleForm.invalid) {
       this.motorcycleForm.markAllAsTouched();
       return;
@@ -176,7 +215,13 @@ export class MotorcycleAddComponent implements OnInit {
       .pipe(
         filter(Boolean),
         tap(() => modelControl?.enable()),
-        tap((brandId) => this.loadModels(brandId))
+        tap((brandId) => {
+          this.brandSelected = this.brands().find(
+            (brand) => brand.id === Number(brandId)
+          ) ?? { id: 0, name: '' };
+          this.motorcycleForm.patchValue({ model: '' });
+          return this.loadModels(brandId);
+        })
       )
       .subscribe();
   }
