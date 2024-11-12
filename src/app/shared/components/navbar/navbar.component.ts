@@ -24,7 +24,7 @@ interface NavItem {
   ],
   template: `
     @let isMobile = isMobile$ | async;
-    <nav class="relative flex items-center justify-center bg-white py-3">
+    <nav class="relative flex items-center justify-center border bg-white py-3">
       @if (!isMobile) {
         <div class="flex-1">
           <h1>MG2</h1>
