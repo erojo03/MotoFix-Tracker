@@ -15,6 +15,7 @@ import { PopupService } from '../../../../../core/services/utils/popup.service';
     <div class="flex flex-col">
       <button
         (click)="openPopup('userProfile')"
+        (click)="clickOutsideEvent()"
         class="flex items-center gap-2 rounded-xl px-2 py-2 hover:bg-[rgba(245,245,245)]">
         <svg
           xmlns="http://www.w3.org/2000/svg"
