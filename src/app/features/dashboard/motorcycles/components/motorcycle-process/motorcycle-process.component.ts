@@ -155,27 +155,32 @@ import { toSignal } from '@angular/core/rxjs-interop';
       <!-- Ver como agregar el boton de casos alternos -->
       <!-- limitar el boton cuando llegue a la ultima secuencia -->
       <div class="flex gap-2 self-end">
-        <button
-          (click)="confirmProcess()"
-          class="button group relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-none bg-emerald-600 font-semibold shadow-lg transition-all duration-300 hover:w-32 hover:rounded-full hover:bg-emerald-500">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="white"
-            class="w-6 transition-all duration-300 group-hover:w-7 group-hover:-translate-x-[38px]">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
+        @if (
+          (currentProcess === 4 && currentUser.role === 'mechanic') ||
+          currentProcess !== 4
+        ) {
+          <button
+            (click)="confirmProcess()"
+            class="button group relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-none bg-emerald-600 font-semibold shadow-lg transition-all duration-300 hover:w-32 hover:rounded-full hover:bg-emerald-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="white"
+              class="w-6 transition-all duration-300 group-hover:w-7 group-hover:-translate-x-[38px]">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
 
-          <span
-            class="absolute top-[-20px] text-[2px] text-white transition-all duration-300 group-hover:translate-x-3.5 group-hover:translate-y-[34px] group-hover:text-sm group-hover:opacity-100"
-            >Confirmar</span
-          >
-        </button>
+            <span
+              class="absolute top-[-20px] text-[2px] text-white transition-all duration-300 group-hover:translate-x-3.5 group-hover:translate-y-[34px] group-hover:text-sm group-hover:opacity-100"
+              >Confirmar</span
+            >
+          </button>
+        }
 
         <button
           (click)="deleteMotorcycle()"
@@ -219,6 +224,8 @@ export class MotorcycleProcessComponent implements OnInit {
   mechanicsAvailable = toSignal(this._userService.getAvailableMechanics());
   motorcycleProcesses = this._motorcycleProcessService.processes;
   isClosingPopup = this._popupService.isClosingPopup;
+  currentUser = this._currentUserService;
+  currentProcess = 0;
 
   ngOnInit() {
     this.loadProcesses(this.motorcycleInfo().id);
@@ -230,7 +237,12 @@ export class MotorcycleProcessComponent implements OnInit {
   }
 
   loadProcesses(id: number) {
-    this._motorcycleProcessService.getProcesses(id).subscribe();
+    this._motorcycleProcessService.getProcesses(id).subscribe({
+      next: (data) => {
+        this.currentProcess = data[data.length - 1].process.sequence;
+        console.log(this.currentProcess);
+      },
+    });
   }
 
   confirmProcess() {
@@ -250,7 +262,6 @@ export class MotorcycleProcessComponent implements OnInit {
       .subscribe({
         next: () => {
           this.loadProcesses(this.motorcycleInfo().id);
-          console.log('Process Complete Successfully');
         },
         error: (error) =>
           this.handleError('Error al actualizar el proceso', error),
@@ -268,7 +279,7 @@ export class MotorcycleProcessComponent implements OnInit {
   }
 
   private determineUserId(sequence: number): string | undefined {
-    if (sequence % 2 === 0) return this._currentUserService.id;
+    if (sequence % 2 === 0) return this.currentUser.id;
     if (sequence === 3 && this.mechanicId) return this.mechanicId;
     return undefined;
   }
